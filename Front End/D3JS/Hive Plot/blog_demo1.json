@@ -1,0 +1,36 @@
+{
+    "lesseeName": "lesseeInstance1",
+    "contact": "enterzhu@gmail.com",
+    "description": "Instance1's tenant",
+    "logo": "http://www.staydan.com/favicon.ico",
+    "sessionTimeout": "",
+    "vendor": [
+        "com.google.weather"
+    ],
+    "IdP": [
+        {
+            "id": "Google"
+        }
+    ],
+    "groups": [
+        {
+            "id": "group_staydan_auth",
+            "name": "STAYDAN_AUTH_DEV_GROUP",
+            "idpId": "Google"
+        }
+    ],
+    "authz": [
+        {
+            "rule": [
+                "group_staydan_auth",
+                "com.google.weather"
+            ]
+        },
+        {
+            "rule": [
+                "group_staydan_show",
+                "com.google.weather"
+            ]
+        }
+    ]
+}

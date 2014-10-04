@@ -1,0 +1,89 @@
+{
+    "lesseeName": "lesseeInstance1",
+    "contact": "enterzhu@gmail.com",
+    "description": "Instance1's tenant",
+    "logo": "http://www.staydan.com/favicon.ico",
+    "sessionTimeout": "",
+    "services": [
+        "com.google.weather",
+        "com.google.map"
+    ],
+    "IdP": [
+        {
+            "id": "Google"
+        },
+        {
+            "id": "LinkedIn"
+        },
+        {
+            "id": "Amazon"
+        }
+    ],
+    "groups": [
+        {
+            "id": "group_staydan_auth",
+            "name": "STAYDAN_AUTH_DEV_GROUP",
+            "idpId": "Google",
+            "users": "ins11@google.com;ins12@google.com"
+        },
+        {
+            "id": "group_staydan_auth",
+            "name": "STAYDAN_AUTH_DEV_GROUP",
+            "idpId": "LinkedIn",
+            "users": "ins11@linkedin.com;ins12@linkedin.com"
+        },
+        {
+            "id": "group_staydan_auth",
+            "name": "STAYDAN_AUTH_DEV_GROUP",
+            "idpId": "LinkedIn",
+            "users": "ins21@linkedin.com;vpl22@linkedin.com"
+        },
+        {
+            "id": "group_staydan_show",
+            "name": "STAYDAN_SHOW_DEV_GROUP",
+            "idpId": "Amazon"
+        },
+        {
+            "id": "group_staydan_street_view",
+            "name": "STAYDAN_STREET_VIEW_GROUP",
+            "idpId": "Amazon"
+        },
+        {
+            "id": "group_staydan_map",
+            "name": "STAYDAN_MAP_DEV_GROUP",
+            "idpId": "Amazon"
+        }
+    ],
+    "authz": [
+        {
+            "rule": [
+                "group_staydan_show",
+                "com.google.weather"
+            ]
+        },
+        {
+            "rule": [
+                "group_staydan_street_view",
+                "com.google.weather"
+            ]
+        },
+        {
+            "rule": [
+                "group_staydan_map",
+                "com.google.weather"
+            ]
+        },
+        {
+            "rule": [
+                "group_staydan_auth",
+                "com.google.map"
+            ]
+        },
+        {
+            "rule": [
+                "group_staydan_auth",
+                "com.google.map"
+            ]
+        }
+    ]
+}
