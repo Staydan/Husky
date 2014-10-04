@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ExtJS Grid single click and double click trigger - Xiaodan's Everything</title>
+    <style>
+        .x-grid-row .linkable-cell {
+            color: #0197d6;
+        }
+        .grid-demo-panel-label {
+            margin: 10px 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="example-grid"></div>
+    <footer>Staydan.com</footer>
+    <script src="http://cdn.sencha.io/ext-4.2.0-gpl/ext-all.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://docs.sencha.com/extjs/4.2.3/extjs-build/examples/build/KitchenSink/ext-theme-neptune/lib/prettify/prettify.css">
+    <link rel="stylesheet" type="text/css" href="http://docs.sencha.com/extjs/4.2.3/extjs-build/examples/build/KitchenSink/ext-theme-neptune/resources/KitchenSink-all.css">
+    <script>
+        var items = [['Xiaodan',  "xiaodan@staydan.com", "1224"],
+                    ['Bart',  "bart@staydan.com", "1234"],
+                    ['Homer', "home@staydan.com", "1244"],
+                    ['Marge', "marge@staydan.com", "1254"]];
+
+        Ext.require([
+            'Ext.data.*',
+            'Ext.grid.*'
+        ]);
+
+        Ext.define('Person',{
+            extend: 'Ext.data.Model',
+            fields: [
+                'name', 'email', 'phone'
+            ]
+        });
+
+        // create the Data Store
+        var store = Ext.create('Ext.data.Store', {
+            model: 'Person',
+            autoLoad: true,
+            proxy: {
+                type: 'memory',
+                data: this.items,
+                reader: {
+                    type: 'array'
+                }
+            }
+        });
+
+        Ext.define('Staydan.view.gridDemo', {
+            extend: 'Ext.grid.Panel',
+            alias: 'widget.gridDemoPanel',
+            title: 'Single click & Double click Trigger',
+            store: store,
+            columns: [
+                { text: 'Name',  dataIndex: 'name' },
+                {
+                    text: 'Email',
+                    dataIndex: 'email',
+                    tdCls: 'linkable-cell',
+                    flex: 1,
+                    renderer: function (value, metadata) {
+                        metadata.tdAttr = 'data-qtip=Double&nbsp;click&nbsp;to&nbsp;send&nbsp;mail.';
+                        return value;
+                    }
+                },
+                { text: 'Phone', dataIndex: 'phone' }
+            ],
+            height: 200,
+            width: 400,
+            initComponent: function() {
+                // register custom events
+                // this.addEvents('itemdeletebuttonclick', 'itemeditbuttonclick');
+                this.callParent(arguments);
+            }
+        });
+
+        Ext.define('Staydan.view.gridEditorDemo', {
+            extend: 'Ext.grid.Panel',
+            alias: 'widget.gridEditorDemoPanel',
+            title: 'EditorPlugin Enabled - Single click & Double click Trigger',
+            store: store,
+            plugins: [
+                Ext.create('Ext.grid.plugin.RowEditing', {
+                    clicksToEdit: 1
+                })
+            ],
+            columns: [
+                { text: 'Name',  dataIndex: 'name' },
+                {
+                    text: 'Email',
+                    dataIndex: 'email',
+                    tdCls: 'linkable-cell',
+                    flex: 1,
+                    renderer: function (value, metadata) {
+                        metadata.tdAttr = 'data-qtip=Double&nbsp;click&nbsp;to&nbsp;send&nbsp;mail.';
+                        return value;
+                    },
+                    editor: 'textfield'
+                },
+                { text: 'Phone', dataIndex: 'phone' }
+            ],
+            height: 200,
+            width: 400,
+            initComponent: function() {
+                this.callParent(arguments);
+            }
+        });
+
+        Ext.define('Staydan.controller.gridDemo', {
+            extend: 'Ext.app.Controller',
+            views: [
+                'Staydan.view.gridDemo'
+            ],
+
+            refs: [
+                {
+                    ref: 'gridDemoPanel',
+                    selector: 'gridDemoPanel'
+                },
+                {
+                    ref: 'gridDemoPanelLabel',
+                    selector: '#gridDemoPanelLabel'
+                },
+                {
+                    ref: 'gridEditorDemoPanelLabel',
+                    selector: '#gridEditorDemoPanelLabel'
+                }
+            ],
+
+            config: {
+                celldblclicked: false,
+                editorCelldblclicked: false,
+                singleClickedTimes: 0,
+                rowEditorStarted: false // Set this flag to avoid the endless loop
+            },
+
+            init: function() {
+               this.control({
+                   'gridDemoPanel': {
+                       itemclick: this.onItemClick,
+                       celldblclick: this.onCelldblclick
+                   },
+                   'gridEditorDemoPanel': {
+                       beforeedit: this.onBeforeEdit,
+                       celldblclick: this.onEditorCelldblclick
+                   }
+               });
+            },
+
+            onBeforeEdit: function (grid, context, eOpts) {
+                this.setSingleClickedTimes(this.getSingleClickedTimes() + 1);
+                var self = this;
+                if (self.getRowEditorStarted()) {
+                    self.setRowEditorStarted(false);
+                } else {
+                    window.setTimeout(function () {
+                        grid.cancelEdit();
+                        window.setTimeout(function () {
+                            if(self.getSingleClickedTimes() > 0) {
+                                if (self.getEditorCelldblclicked()) {
+                                    self.setEditorCelldblclicked(false);
+                                    self.setSingleClickedTimes(0);
+                                } else {
+                                    self.setRowEditorStarted(true);
+                                    grid.startEdit(context.record, context.column);
+                                    self.getGridEditorDemoPanelLabel().setText("Edit mode enabled.");
+                                }
+                            }
+                        }, 300);
+                    }, 1);
+                }
+            },
+
+            onItemClick: function (context, record, item, index, el) {
+                this.setSingleClickedTimes(this.getSingleClickedTimes() + 1);
+                var self = this;
+                window.setTimeout(function () {
+                    if(self.getSingleClickedTimes() > 0) {
+                        if (self.getCelldblclicked()) {
+                            self.setCelldblclicked(false);
+                            self.setSingleClickedTimes(0);
+                        } else {
+                            self.itemClicked(context, record, item, index, el);
+                        }
+                    }
+                }, 200);
+            },
+
+            itemClicked: function(context, record, item, index, el) {
+                if(this.getSingleClickedTimes() > 0) {
+                    this.getGridDemoPanelLabel().setText("Single clicked.  \n\r" + record.data.email);
+                    this.setSingleClickedTimes(0);
+                }
+            },
+
+            onCelldblclick: function(context, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+                this.setCelldblclicked(true);
+                this.getGridDemoPanelLabel().setText("Double clicked.  \n\r" + record.data.email);
+            },
+
+            onEditorCelldblclick: function(context, td, cellIndex, record, tr, rowIndex, e, eOpts) {
+                this.setEditorCelldblclicked(true);
+                this.getGridEditorDemoPanelLabel().setText("Double clicked.  \n\r" + record.data.email);
+            }
+         });
+
+        Ext.application({
+            name: 'StaydanGridDemo',
+            controllers: ['Staydan.controller.gridDemo'],
+            launch: function() {
+                Ext.create('Ext.container.Viewport', {
+                    items: [
+                        {
+                            style: 'margin:5px 10px;',
+                            columnWidth: 1,
+                            width: 600,
+                            layout: {
+                                type: 'hbox',
+                                align: 'middle'
+                            },
+                            items: [
+                                {
+                                    xtype: 'gridDemoPanel'
+                                },
+                                {
+                                    xtype: 'label',
+                                    itemId: 'gridDemoPanelLabel',
+                                    text: '(Double)Click on a row',
+                                    cls: 'grid-demo-panel-label'
+                                }
+                            ]
+                        },
+                        {
+                            style: 'margin:5px 10px;',
+                            columnWidth: 1,
+                            width: 600,
+                            layout: {
+                                type: 'hbox',
+                                align: 'middle'
+                            },
+                            items: [
+                                {
+                                    xtype: 'gridEditorDemoPanel'
+                                },
+                                {
+                                    xtype: 'label',
+                                    itemId: 'gridEditorDemoPanelLabel',
+                                    text: '(Double)Click on a row',
+                                    cls: 'grid-demo-panel-label'
+                                }
+                            ]
+                        }
+                    ]
+                });
+            }
+        });
+    </script>
+<body>
