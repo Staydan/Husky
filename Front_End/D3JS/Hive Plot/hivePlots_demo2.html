@@ -116,8 +116,6 @@
 
     nodes["rules"] = rules;
 
-    console.log(JSON.stringify(nodes));
-
     nodesLinear.forEach(function (node) {
       if (node.type === "rule") {
         // Add rule node and vendor node - Rule <--> Vendor
@@ -134,8 +132,6 @@
       }
     });
 
-    console.log(JSON.stringify(links));
-    
     var angle = d3.scale.ordinal().domain(d3.range(4)).rangePoints([0, 2 * Math.PI]),
         radius = d3.scale.linear().range([innerRadius, outerRadius]),
         color = d3.scale.category10().domain(d3.range(20));

@@ -4,7 +4,7 @@
     "description": "Instance1's tenant",
     "logo": "http://www.staydan.com/favicon.ico",
     "sessionTimeout": "",
-    "services": [
+    "vendor": [
         "com.google.weather",
         "com.google.map"
     ],
